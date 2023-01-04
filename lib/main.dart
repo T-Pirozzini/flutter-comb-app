@@ -101,8 +101,10 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {
-                    LocationService().getPlaceId(_searchController.text);
+                  onPressed: () async {
+                    var place = await LocationService()
+                        .getPlace(_searchController.text);
+                    _goToPlace(place);
                   },
                   icon: Icon(Icons.search),
                 ),
@@ -144,6 +146,15 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+
+  Future<void> _goToPlace(Map<String, dynamic> place) async {
+    final double lat = place['geometry']['location']['lat'];
+    final double lng = place['geometry']['location']['lng'];
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(target: LatLng(lat, lng), zoom: 14),
+    ));
   }
 
   Future<void> _goToNanaimo() async {
