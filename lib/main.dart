@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'dart:async';
 
 void main() => runApp(const MyApp());
 
@@ -11,13 +12,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late GoogleMapController mapController;
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
 
-  final LatLng _center = const LatLng(45.521563, -122.677433);
+  static const CameraPosition _vancouver = CameraPosition(
+    target: LatLng(49.2827, -123.1207),
+    zoom: 14.4746,
+  );
 
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
+  static const CameraPosition _nanaimo =
+      CameraPosition(target: LatLng(49.16638, -123.94003), zoom: 14);
 
   @override
   Widget build(BuildContext context) {
@@ -25,13 +29,17 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         backgroundColor: Colors.amber,
         appBar: AppBar(
-          title: Text(
-            "Comb",
-            style: TextStyle(
-                fontSize: 32.0,
-                fontFamily: 'Alice',
-                color: Color.fromARGB(255, 218, 69, 99)),
-          ),
+          title: Row(children: [
+            Icon(Icons.water,
+                color: Color.fromARGB(255, 218, 69, 99), size: 40.0),
+            Text(
+              "Comb",
+              style: TextStyle(
+                  fontSize: 32.0,
+                  fontFamily: 'Alice',
+                  color: Color.fromARGB(255, 218, 69, 99)),
+            ),
+          ]),
           centerTitle: true,
           backgroundColor: Color.fromARGB(255, 5, 32, 45),
           elevation: 0.0,
@@ -64,12 +72,19 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         body: GoogleMap(
-          onMapCreated: _onMapCreated,
-          initialCameraPosition: CameraPosition(
-            target: _center,
-            zoom: 11.0,
-          ),
+          mapType: MapType.hybrid,
+          initialCameraPosition: _vancouver,
+          onMapCreated: (GoogleMapController controller) {
+            _controller.complete(controller);
+          },
+          myLocationButtonEnabled: true,
+          myLocationEnabled: true,
         ),
+        // floatingActionButton: FloatingActionButton.extended(
+        //   onPressed: _goToNanaimo,
+        //   label: const Text('To Nanaimo!'),
+        //   icon: const Icon(Icons.directions_boat),
+        // ),
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
@@ -88,5 +103,10 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+
+  Future<void> _goToNanaimo() async {
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(_nanaimo));
   }
 }
