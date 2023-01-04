@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_comb_app/services/location_services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 
@@ -100,7 +101,9 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    LocationService().getPlaceId(_searchController.text);
+                  },
                   icon: Icon(Icons.search),
                 ),
               ],
