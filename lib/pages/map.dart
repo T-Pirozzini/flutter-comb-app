@@ -51,7 +51,6 @@ class _MapState extends State<Map> {
           ],
         ),
       ),
-      body: SafeArea(),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -66,7 +65,7 @@ class _MapState extends State<Map> {
             icon: Icon(Icons.info),
             label: 'Species Info',
           ),
-        ],       
+        ],
       ),
     );
   }
