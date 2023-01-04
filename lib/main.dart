@@ -14,6 +14,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
+  final TextEditingController _searchController = TextEditingController();
 
   static const CameraPosition _vancouver = CameraPosition(
     target: LatLng(49.2827, -123.1207),
@@ -23,11 +24,24 @@ class _MyAppState extends State<MyApp> {
   static const CameraPosition _nanaimo =
       CameraPosition(target: LatLng(49.16638, -123.94003), zoom: 14);
 
+  static final Marker _kGooglePlexMarker = Marker(
+    markerId: MarkerId('_kGooglePlex'),
+    infoWindow: InfoWindow(title: 'Google Plex'),
+    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueMagenta),
+    position: LatLng(49.2827, -123.1207),
+  );
+
+  static final Marker _nanaimoBastion = Marker(
+    markerId: MarkerId('Bastion'),
+    infoWindow: InfoWindow(title: 'Bastion Landmark'),
+    icon: BitmapDescriptor.defaultMarker,
+    position: LatLng(49.16638, -123.94003),
+  );
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: Colors.amber,
         appBar: AppBar(
           title: Row(children: [
             Icon(Icons.water,
@@ -71,20 +85,44 @@ class _MyAppState extends State<MyApp> {
             ],
           ),
         ),
-        body: GoogleMap(
-          mapType: MapType.hybrid,
-          initialCameraPosition: _vancouver,
-          onMapCreated: (GoogleMapController controller) {
-            _controller.complete(controller);
-          },
-          myLocationButtonEnabled: true,
-          myLocationEnabled: true,
+        body: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _searchController,
+                    textCapitalization: TextCapitalization.words,
+                    decoration: InputDecoration(hintText: 'Search by City'),
+                    onChanged: (value) {
+                      print(value);
+                    },
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: Icon(Icons.search),
+                ),
+              ],
+            ),
+            Expanded(
+              child: GoogleMap(
+                mapType: MapType.hybrid,
+                initialCameraPosition: _vancouver,
+                onMapCreated: (GoogleMapController controller) {
+                  _controller.complete(controller);
+                },
+                markers: {_kGooglePlexMarker, _nanaimoBastion},
+                myLocationEnabled: true,
+              ),
+            ),
+          ],
         ),
-        // floatingActionButton: FloatingActionButton.extended(
-        //   onPressed: _goToNanaimo,
-        //   label: const Text('To Nanaimo!'),
-        //   icon: const Icon(Icons.directions_boat),
-        // ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: _goToNanaimo,
+          label: const Text('To Nanaimo!'),
+          icon: const Icon(Icons.directions_boat),
+        ),
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
